@@ -28,7 +28,7 @@ class BlogController
             // 取出缓冲区的内容
             $str = ob_get_contents();
             // 生成静态页
-            file_put_contents(ROOT.'public/content/'.$v['id'].'.html',$str);
+            file_put_contents(ROOT.'public/contents/'.$v['id'].'.html',$str);
             // 清空缓冲区
             ob_clean();
         }
