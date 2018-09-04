@@ -16,32 +16,27 @@ function view($file,$data=[]){
     require_once ROOT . 'views/'. str_replace('.','/',$file) . '.html';
 }
 
-// 解析路由
-function route(){
+    // 解析路由
     // 获取url
-    $url = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '/';
-    //定义默认控制器和方法
-    $defaultController = 'IndexController';
-    $dataultAction = 'index';
-    if($url=='/'){
-        return [
-            $defaultController,
-            $dataultAction
-        ];
-    }else if(strpos($url,'/',1) !==false){
-        $url = ltrim($url,'/');
-        $route = explode('/',$url);
-        // 格式化控制器名称
-        $route[0] = ucfirst($route[0]).'Controller';
-        return $route;
-    }else{
-        die('请求的url地址不正确');
+    if( isset($_SERVER['PATH_INFO']) )
+    {
+        $pathInfo = $_SERVER['PATH_INFO'];
+        // 根据 / 转成数组
+        $pathInfo = explode('/', $pathInfo);
+
+        // 得到控制器名和方法名 ：
+        $controller = ucfirst($pathInfo[1]) . 'Controller';
+        $action = $pathInfo[2];
     }
-}
-$route = route();
+    else
+    {
+        // 默认控制器和方法
+        $controller = 'IndexController';
+        $action = 'index';
+    }
+
 
 // 任务分发到控制器
-$controller = "controllers\\{$route[0]}";
-$active = $route[1];
+$controller = 'controllers\\'.$controller;
 $_C = new $controller;
-$_C->$active();
+$_C->$action();

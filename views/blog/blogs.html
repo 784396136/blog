@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <table border="1" width="100%">
+        <tr>
+            <th>ID</th>
+            <th width="40%">标题</th>
+            <th>
+                发表日期
+            </th>
+            <th>修改日期</th>
+            <th>是否显示</th>
+            <th>
+                浏览量
+            </th>
+            <th>操作</th>
+            <?php foreach($data as $v): ?>
+            <tr>
+                <td><?=$v['id']?></td>
+                <td><a href="/contents/<?=$v['id']?>.html"><?=$v['title']?></a></td>
+                <td><?=$v['created_at']?></td>
+                <td><?=$v['updated_at']?></td>
+                <td><?= $v['is_show']==1?'显示':'不显示' ?></td>
+                <td><?=$v['display']?></td>
+                <td>
+                    <a href="">修改</a>
+                    <a href="">删除</a>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tr>
+    </table>
+</body>
+</html>

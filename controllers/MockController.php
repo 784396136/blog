@@ -7,6 +7,8 @@ class MockController{
     {
         $pdo = new PDO('mysql:host=127.0.0.1;dbname=blog', 'root', '');
         $pdo->exec('SET NAMES utf8');
+        // 清空表
+        $pdo->exec('TRUNCATE blogs');
 
         for($i=0;$i<100;$i++)
         {
@@ -17,7 +19,8 @@ class MockController{
             $date = rand(1233333399,1535592288);
             $date = date('Y-m-d H:i:s', $date);
             $pdo->exec("INSERT INTO blogs (title,content,display,is_show,created_at) VALUES('$title','$content',$display,$is_show,'$date')");
-            print_r($pdo->errorInfo());
+            // 抛出错误异常
+            // print_r($pdo->errorInfo());
         }
     }
 
