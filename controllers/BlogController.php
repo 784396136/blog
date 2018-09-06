@@ -16,7 +16,7 @@ class BlogController
     {
         $blog = new Blog;
         $data = $blog->search();
-       
+        
         // 开启缓冲区
         ob_start();
         // 生成静态页

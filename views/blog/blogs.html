@@ -10,6 +10,9 @@
         font-size: 1.2em;
         color: #F00;
     }
+    .btns-active {
+        color: #f00;
+    }
     </style>
 </head>
 <body>
@@ -32,6 +35,7 @@
             <th>ID</th>
             <th width="40%">标题</th>
             <th>
+                
                 发表日期
                 <a href="?order_by=date&order_way=asc<?=getUrl(['order_by','order_way'])?>"  <?php if(@$_GET['order_by']=='date' && @$_GET['order_way']=='asc') echo 'class="order_active"' ?> >㊤</a>
                 <a href="?order_by=date&order_way=desc<?=getUrl(['order_by','order_way'])?>" <?php if(@$_GET['order_by']=='date' && @$_GET['order_way']=='desc') echo 'class="order_active"' ?> >㊦</a>
@@ -60,5 +64,7 @@
             <?php endforeach; ?>
         </tr>
     </table>
+    <br>
+    <?=$btns?>
 </body>
 </html>
