@@ -1,7 +1,7 @@
 <?php
 // 定义常量 根目录绝对路径
 define('ROOT',dirname(__FILE__).'/../');
-
+require(ROOT.'vendor/autoload.php');
 // 自动加载
 function autoLoadClass($class){
     require_once ROOT. str_replace('\\','/',$class).".php";

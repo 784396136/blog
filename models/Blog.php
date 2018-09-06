@@ -1,6 +1,7 @@
 <?php
 namespace models;
 use PDO;
+use libs\Redis;
 
 class Blog extends Base
 {
@@ -81,5 +82,82 @@ class Blog extends Base
             'data'=>$data,
             'btns'=>$btns,
         ];
+    }
+
+    // 获取浏览量
+    public function getDisplay($id)
+    {
+        // 用id拼出键名
+        $key = "blog-{$id}";
+
+        // 连接Redis
+        $redis = new \Predis\Client([
+            'scheme' => 'tcp',
+            'host'   => '127.0.0.1',
+            'port'   => 6379,
+        ]);
+
+        // 判断hash中是否有这个键如果有就操作内存，没有就从数据库取
+        if($redis->hexists('blog_displays',$key))
+        {
+            // 累加 并返回值
+            $newNum = $redis->hincrby('blog_displays',$key,1);
+            return $newNum;
+        }
+        else
+        {
+            $stmt = self::$pdo->prepare('SELECT display FROM blogs WHERE id = ?');
+            $stmt->execute([$id]);
+            $display = $stmt->fetch( PDO::FETCH_COLUMN );
+            $display ++;
+            // 保存到Redis
+            $redis->hset('blog_displays',$key,$display);
+            return $display;
+        }
+    }
+
+    // 生成静态页
+    public function content_to_html()
+    {
+        $stmt = self::$pdo->query("SELECT * FROM blogs");
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // 开启缓冲区
+        ob_start();
+        // 生成静态页
+        foreach($data as $v)
+        {
+            view('blog.content',[
+                'blog'=>$v,
+            ]);
+            // 取出缓冲区的内容
+            $str = ob_get_contents();
+            // 生成静态页
+            file_put_contents(ROOT.'public/contents/'.$v['id'].'.html',$str);
+            // 清空缓冲区
+            ob_clean();
+        }
+    }
+
+    // 定期写回数据库
+    public function displayToDb()
+    {
+        echo '123';
+        // 先取出Redis中的数据
+        $redis = new \Predis\Client([
+            'scheme' => 'tcp',
+            'host'   => '127.0.0.1',
+            'port'   => 6379,
+        ]);
+        
+        $data = $redis->hgetall('blog_displays');
+        foreach($data as $k=>$v)
+        {
+            $id = str_replace('blog-','',$k);
+            $sql = "UPDATE blogs SET display = ? WHERE id = ?";
+            $value = [$v,$id];
+            $stmt = self::$pdo->prepare($sql);
+            $stmt->execute($value);
+        }
     }
 }

@@ -11,28 +11,26 @@ class BlogController
         view('blog.blogs',$data);
     }
     
-    // 生成静态页
+    // 为所有的日志生成静态页
     public function content_to_html()
     {
         $blog = new Blog;
-        $data = $blog->search();
-        
-        // 开启缓冲区
-        ob_start();
-        // 生成静态页
-        foreach($data as $v)
-        {
-            view('blog.content',[
-                'blog'=>$v,
-            ]);
-            // 取出缓冲区的内容
-            $str = ob_get_contents();
-            // 生成静态页
-            file_put_contents(ROOT.'public/contents/'.$v['id'].'.html',$str);
-            // 清空缓冲区
-            ob_clean();
-        }
+        $blog->content_to_html();
     }
 
+    public function display()
+    {
+        // 接受日志ID
+        $id = (int)$_GET['id'];
+        $blog = new Blog;
+        echo $blog->getDisplay($id);
+    }
+
+    //将内存中的数据写回数据库
+    public function toDb()
+    {
+        $blog = new Blog;
+        $blog->displayToDb();
+    }
     
 }
