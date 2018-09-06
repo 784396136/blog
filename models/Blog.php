@@ -33,9 +33,27 @@ class Blog extends Base
             $where .= " AND is_show = {$_GET['is_show']}";
             $value[] = $_GET['is_show'];
         }
+
+        /*----------------排序--------------------*/
+        // 默认排序条件
+        $orderBy = 'created_at';
+        $orderWay = 'desc';
+
+        if(isset($_GET['order_by']) && $_GET['order_by']=='display')
+        {
+            $orderBy = 'display';
+        }
+        if(isset($_GET['order_way']) && $_GET['order_way']=='asc')
+        {
+            $orderWay = 'asc';
+        }
+
+       
+
         // 进行预处理
-        $stmt = self::$pdo->prepare("SELECT * FROM blogs WHERE $where");    
-        $stmt->execute($value);
+        $stmt = self::$pdo->prepare("SELECT * FROM blogs WHERE $where ORDER BY $orderBy $orderWay");    
+        $stmt->execute();
+        // var_dump($stmt);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $data;
     }

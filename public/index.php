@@ -9,7 +9,8 @@ function autoLoadClass($class){
 spl_autoload_register('autoLoadClass');
 
 // view 函数
-function view($file,$data=[]){
+function view($file,$data=[])
+{
     if($data){
         extract($data);
     }
@@ -26,7 +27,15 @@ function view($file,$data=[]){
 
         // 得到控制器名和方法名 ：
         $controller = ucfirst($pathInfo[1]) . 'Controller';
-        $action = $pathInfo[2];
+        if($pathInfo[2]=='')
+        {
+            $action = 'index';
+        }
+        else
+        {
+            $action = $pathInfo[2];
+        }
+        
     }
     else
     {
@@ -50,4 +59,20 @@ function config($name)
         $config = require ROOT . 'config.php';
     }
     return $config[$name];
+}
+
+// 保存搜索参数
+function getUrl($except = [])
+{
+    $ret = '';
+
+    foreach($_GET as $k=>$v)
+    {
+        if(!in_array($k,$except))
+        {
+            $ret .= "&$k=$v";
+        }
+        
+    }
+    return $ret;
 }

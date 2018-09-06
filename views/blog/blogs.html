@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+    .order_active {
+        font-size: 1.2em;
+        color: #F00;
+    }
+    </style>
 </head>
 <body>
     <div style="margin: 0 auto;">
@@ -27,11 +33,15 @@
             <th width="40%">标题</th>
             <th>
                 发表日期
+                <a href="?order_by=date&order_way=asc<?=getUrl(['order_by','order_way'])?>"  <?php if(@$_GET['order_by']=='date' && @$_GET['order_way']=='asc') echo 'class="order_active"' ?> >㊤</a>
+                <a href="?order_by=date&order_way=desc<?=getUrl(['order_by','order_way'])?>" <?php if(@$_GET['order_by']=='date' && @$_GET['order_way']=='desc') echo 'class="order_active"' ?> >㊦</a>
             </th>
             <th>修改日期</th>
             <th>是否显示</th>
             <th>
                 浏览量
+                <a href="?order_by=display&order_way=asc<?=getUrl(['order_by','order_way'])?>" <?php if(@$_GET['order_by']=='display' && @$_GET['order_way']=='asc') echo 'class="order_active"' ?>>㊤</a>
+                <a href="?order_by=display&order_way=desc<?=getUrl(['order_by','order_way'])?>" <?php if(@$_GET['order_by']=='display' && @$_GET['order_way']=='desc') echo 'class="order_active"' ?>>㊦</a>
             </th>
             <th>操作</th>
             <?php foreach($data as $v): ?>
