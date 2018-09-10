@@ -33,4 +33,9 @@ class BlogController
         $blog->displayToDb();
     }
     
+    // 发表日志
+    public function create()
+    {
+        view('blog.create');
+    }
 }

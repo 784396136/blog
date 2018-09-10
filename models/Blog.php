@@ -91,11 +91,7 @@ class Blog extends Base
         $key = "blog-{$id}";
 
         // 连接Redis
-        $redis = new \Predis\Client([
-            'scheme' => 'tcp',
-            'host'   => '127.0.0.1',
-            'port'   => 6379,
-        ]);
+        $redis = \libs\Redis::getInstance();
 
         // 判断hash中是否有这个键如果有就操作内存，没有就从数据库取
         if($redis->hexists('blog_displays',$key))
@@ -144,11 +140,7 @@ class Blog extends Base
     {
         echo '123';
         // 先取出Redis中的数据
-        $redis = new \Predis\Client([
-            'scheme' => 'tcp',
-            'host'   => '127.0.0.1',
-            'port'   => 6379,
-        ]);
+        $redis = \libs\Redis::getInstance();
         
         $data = $redis->hgetall('blog_displays');
         foreach($data as $k=>$v)

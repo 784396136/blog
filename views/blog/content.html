@@ -5,11 +5,13 @@
     <title><?=$blog['title']?></title>
 </head>
 <body>
+    <?php view('common.nav') ?>
 
     <h1><?=$blog['title']?></h1>
     <p>浏览量:<span id="display"></span></p>
     <p><?=$blog['content']?></p>
-    
+
+    <?php view('common.footer') ?>
 </body>
 </html>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="crossorigin="anonymous"></script>

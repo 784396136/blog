@@ -13,12 +13,12 @@ return [
         'charset' => 'utf8',
     ],
     'email' => [
-        'mode' => 'debug',    // 值：debug  和 production
+        'mode' => 'production',    // 值：debug  和 production
         'port' => 25,
         'host' => 'smtp.126.com',
-        'name' => 'czxy_qz@126.com',
-        'pass' => '12345678abcdefg',
-        'from_email' => 'czxy_qz@126.com',
+        'name' => 'a784396136@126.com',
+        'pass' => 'wang784396136',   //授权码
+        'from_email' => 'a784396136@126.com',
         'from_name' => '全栈1班',
     ]
 ];
