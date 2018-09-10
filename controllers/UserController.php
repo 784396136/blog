@@ -11,6 +11,21 @@ class UserController
         view('user.login');
     }
 
+    public function dologin()
+    {
+        $email = $_POST['email'];
+        $pwd = md5($_POST['password']);
+        $user = new User;
+        if($user->login($email,$pwd))
+        {
+            die('登录成功！');
+        }
+        else
+        {
+            die('用户名或密码错误');
+        }
+    }
+
     // 注册
     public function register()
     {
