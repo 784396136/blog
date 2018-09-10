@@ -4,6 +4,14 @@ use models\User;
 
 class UserController
 {
+
+    // 登录
+    public function login()
+    {
+        view('user.login');
+    }
+
+    // 注册
     public function register()
     {
         // 显示视图
