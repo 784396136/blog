@@ -8,7 +8,7 @@ class Blog extends Base
 
     public function search()
     {
-        $where = 1;
+        $where = 'user_id ='.$_SESSION['id'];
         $value = [];
         // 如果有keyword值并且不为空时添加where条件
         if(isset($_GET['keywords']) && $_GET['keywords'])
@@ -151,5 +151,38 @@ class Blog extends Base
             $stmt = self::$pdo->prepare($sql);
             $stmt->execute($value);
         }
+    }
+
+    // 添加日志
+    public function add($title,$content,$is_show)
+    {
+        $stmt = self::$pdo->prepare("INSERT INTO blogs(title,content,is_show,user_id) VALUES(?,?,?,?)");
+        $ret = $stmt->execute([
+            $title,
+            $content,
+            $is_show,
+            $_SESSION['id'],
+        ]);
+        if(!$ret)
+        {
+            echo '失败';
+            // 获取失败信息
+            $error = $stmt->errorInfo();
+            echo '<pre>';
+            var_dump($error);
+            exit;
+        }
+        return self::$pdo->lastInsertId();
+    }
+
+    // 删除日志
+    public function delete()
+    {
+        $id = $_GET['id'];
+        $stmt = self::$pdo->prepare("DELETE FROM blogs WHERE id = ? AND user_id = ?");
+        return $stmt->execute([
+            $id,
+            $_SESSION['id'],
+        ]);
     }
 }

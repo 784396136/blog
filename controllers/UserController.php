@@ -18,12 +18,19 @@ class UserController
         $user = new User;
         if($user->login($email,$pwd))
         {
-            die('登录成功！');
+            message('登录成功',2,'/blog/index');
         }
         else
         {
-            die('用户名或密码错误');
+            message('账号密码错误',2,'/user/login');
         }
+    }
+
+    // 退出
+    public function logout()
+    {
+        $_SESSION = [];
+        message('退出成功',2,'/blog/index');
     }
 
     // 注册
@@ -47,7 +54,7 @@ class UserController
         ]);
         if($stmt)
         {
-            die('该用户名已被注册！');
+            message('该用户名已被注册',2,'/user/login');
         }
         // 生成激活码
         $code = md5(rand(1,99999));
@@ -95,11 +102,11 @@ class UserController
             $user = new User;
             if($user->add($data['email'],$data['password']))
             {
-                die('注册成功');
+                message('注册成功',2,'/user/login');
             }
             else
             {
-                die('注册失败');
+                message('注册失败',2,'/user/register');
             }
             // 跳转登录页面
             header('Location:/user/register');

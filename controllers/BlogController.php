@@ -38,4 +38,35 @@ class BlogController
     {
         view('blog.create');
     }
+
+    public function docreate()
+    {
+        $title = $_POST['title'];
+        $content = $_POST['content'];
+        $is_show = $_POST['is_show'];
+        $blog = new Blog;
+        $num = $blog->add($title,$content,$is_show);
+        if($num)
+        {
+            message("发表成功,新添加日志ID为:{$num}",2,'/blog/index');
+        }
+        else
+        {
+            message("发表失败~",2,'/blog/create');
+        }
+    }
+
+    // 删除日志
+    public function delete()
+    {
+        $blog = new Blog;
+        if($blog->delete())
+        {
+            message("删除成功",2,'/blog/index');
+        }
+        else
+        {
+            message("删除失败",2,'/blog/index');
+        }
+    }
 }
