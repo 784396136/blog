@@ -32,6 +32,23 @@ class BlogController
         $blog = new Blog;
         $blog->displayToDb();
     }
+
+    //显示私有日志
+    public function content()
+    {
+        $id = $_GET['id'];
+        $model = new Blog;
+        $blog = $model->find($id);
+
+        // 判断是否是自己的日志
+        if($_SESSION['id']!=$blog['user_id'])
+        {
+            die('无权访问');
+        }
+        view('blog.content',[
+            'blog'=>$blog,
+        ]);
+    }
     
     // 发表日志
     public function create()
@@ -48,6 +65,10 @@ class BlogController
         $num = $blog->add($title,$content,$is_show);
         if($num)
         {
+            if($is_show == 1)
+            {
+                $blog->makeHtml($id);
+            }
             message("发表成功,新添加日志ID为:{$num}",2,'/blog/index');
         }
         else
@@ -56,12 +77,51 @@ class BlogController
         }
     }
 
+    // 显示修改日志
+    public function edit()
+    {
+        $id = $_GET['id'];
+        $blog = new Blog;
+        $data = $blog->find($id);
+        view('blog.edit',[
+            'data'=>$data,
+        ]);
+    }
+
+    public function update()
+    {
+        $title = $_POST['title'];
+        $content = $_POST['content'];
+        $is_show = $_POST['is_show'];
+        $id = $_POST['id'];
+        $blog = new Blog;
+        $res = $blog->update($title,$content,$is_show,$id);
+        if($res)
+        {
+            if($is_show == 1)
+            {
+                $blog->makeHTML($id);
+            }
+            else
+            {
+                $blog->deleteHtml($id);
+            }
+            message('修改成功！',2,'/blog/index');
+        }
+        else
+        {
+            message('修改失败,请稍后再试~',2,'/blog/edit?id='.$id);
+        }
+    }
+
     // 删除日志
     public function delete()
     {
+        $id = $_GET['id'];
         $blog = new Blog;
-        if($blog->delete())
+        if($blog->delete($id))
         {
+            $blog->deleteHtml($id);
             message("删除成功",2,'/blog/index');
         }
         else

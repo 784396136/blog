@@ -123,6 +123,9 @@ class Blog extends Base
         // 生成静态页
         foreach($data as $v)
         {
+            // echo '<pre>';
+            // var_dump($v);
+            // die();
             view('blog.content',[
                 'blog'=>$v,
             ]);
@@ -175,14 +178,57 @@ class Blog extends Base
         return self::$pdo->lastInsertId();
     }
 
-    // 删除日志
-    public function delete()
+    // 查找日志
+    public function find($id)
     {
-        $id = $_GET['id'];
+        $stmt = self::$pdo->prepare("SELECT * FROM blogs WHERE id = ?");
+        $stmt->execute([
+            $id,
+        ]);
+        return $stmt->fetch();
+    }
+
+    public function update($title,$content,$is_show,$id)
+    {
+        $stmt = self::$pdo->prepare("UPDATE blogs SET title=? , content=? , is_show=? WHERE id=? ");
+        $res = $stmt->execute([
+            $title,
+            $content,
+            $is_show,
+            $id,
+        ]);
+        return $res;
+    }
+
+    // 删除日志
+    public function delete($id)
+    {
         $stmt = self::$pdo->prepare("DELETE FROM blogs WHERE id = ? AND user_id = ?");
         return $stmt->execute([
             $id,
             $_SESSION['id'],
         ]);
+    }
+
+    // 生成静态页
+    public function makeHTML($id)
+    {
+        $blog = $this->find($id);
+
+        // 打开缓冲区
+        ob_start();
+
+        view('blog.content',[
+            'blog'=>$blog,
+        ]);
+        
+        $str = ob_get_clean();
+        file_put_contents(ROOT.'public/contents/'.$id.'.html', $str);
+    }
+
+    // 删除静态页
+    public function deleteHTML($id)
+    {
+        @unlink(ROOT.'public/contents/'.$id.'.html');
     }
 }

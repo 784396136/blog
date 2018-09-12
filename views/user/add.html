@@ -11,6 +11,7 @@
     <h1>注册</h1>
 
     <form action="/user/store" method="post">
+        <?=csrf_field()?>
         <div>
             Email：
             <input type="text" name="email">
