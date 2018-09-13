@@ -2,7 +2,7 @@
 // 设置 SESSION 保存
 ini_set('session.save_handler', 'redis');   // 使用 redis 保存 SESSION
 ini_set('session.save_path', 'tcp://127.0.0.1:6379?database=1');  // 设置 redis 服务器的地址、端口、使用的数据库
-ini_set('session.gc_maxlifetime', 600);   // 设置 SESSION 10分钟过期
+ini_set('session.gc_maxlifetime', 6000);   // 设置 SESSION 10分钟过期
 
 // 开启 SESSION
 session_start();

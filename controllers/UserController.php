@@ -1,9 +1,85 @@
 <?php
 namespace controllers;
 use models\User;
+use models\Order;
 
 class UserController
 {
+    // 头像视图
+    public function face()
+    {
+        view('user.face');
+    }
+
+    public function uploadbig()
+    {
+        /* 接收提交的数据 */
+        $count = $_POST['count'];  // 总的数量
+        $i = $_POST['i'];        // 当前是第几块
+        $size = $_POST['size'];   // 每块大小
+        $name = 'big_img_'.$_POST['img_name'];  // 所有分块的名字
+        $img = $_FILES['img'];    // 图片
+        // echo "<pre>";
+        // var_dump($img);
+        /* 保存每个分片 */
+        move_uploaded_file( $img['tmp_name'] , ROOT.'tmp/'.$i);
+        $redis = \libs\Redis::getInstance();
+        // 每上传一张就加1
+        $uploadedCount = $redis->incr($name);
+        // 如果是最后一个分支就合并
+        if($uploadedCount == $count)
+        {
+            // 以追回的方式创建并打开最终的大文件
+            $fp = fopen(ROOT.'public/uploads/big/'.$name.'.png', 'a');
+            // 循环所有的分片
+            for($i=0; $i<$count; $i++)
+            {
+                // 读取第 i 号文件并写到大文件中
+                fwrite($fp, file_get_contents(ROOT.'tmp/'.$i));
+                // 删除第 i 号临时文件
+                unlink(ROOT.'tmp/'.$i);
+            }
+            // 关闭文件
+            fclose($fp);
+            // 从 redis 中删除这个文件对应的编号这个变量
+            $redis->del($name);
+        }
+    }
+
+    // 测试
+    public function text()
+    {
+        $user = new User;
+        $user->addMoney(20,8);
+    }
+
+    // 充值
+    public function recharge()
+    {
+        view('user.recharge');
+    }
+
+    public function docharge()
+    {
+        $money = $_POST['money'];
+        $order = new Order;
+        $res = $order->create($money);
+        if($res)
+        {
+            message("下单成功,请尽快支付",2,"/user/orders");
+        }
+        else
+        {
+            message("下单失败,请稍后再试",2,"/user/recharge");
+        }
+    }
+
+    public function orders()
+    {
+        $order = new Order;
+        $data = $order->search();
+        view('user.orders',$data);
+    }
 
     // 登录
     public function login()

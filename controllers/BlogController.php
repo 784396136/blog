@@ -117,7 +117,7 @@ class BlogController
     // 删除日志
     public function delete()
     {
-        $id = $_GET['id'];
+        $id = $_POST['id'];
         $blog = new Blog;
         if($blog->delete($id))
         {

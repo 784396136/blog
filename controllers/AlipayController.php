@@ -10,7 +10,7 @@ class AlipayController
     public $config = [
         'app_id' => '2016091700531217',
         // 通知地址
-        'notify_url' => 'https://b7b827ba.ngrok.io/alipay/notify',
+        'notify_url' => ' http://9cd66fcb.ngrok.io/alipay/notify',
         // 跳回地址
         'return_url' => 'http://localhost:3333/alipay/return',
         // 支付宝公钥
@@ -23,15 +23,32 @@ class AlipayController
     // 发起支付
     public function pay()
     {
-        $order = [
-            'out_trade_no' => time(),    // 本地订单ID
-            'total_amount' => '100',    // 支付金额  (元)
-            'subject' => 'test subject', // 支付标题
-        ];
+        $sn = $_POST['sn'];
+        $order = new \models\Order;
+        $data = $order->findBySn($sn);
 
-        $alipay = Pay::alipay($this->config)->web($order);
-
-        $alipay->send();
+        // 如果订单没有支付并且是自己的订单就跳转到支付
+        if($data['status']==0)
+        {
+            if($data['user_id'] == $_SESSION['id'])
+            {
+                // 跳转到支付宝
+                $alipay = Pay::alipay($this->config)->web([
+                    'out_trade_no' => $sn,
+                    'total_amount' => $data['money'],
+                    'subject' => '智聊系统用户充值-'.$data['money'].'元',
+                ]);
+                $alipay->send();
+            }
+            else
+            {
+                die('还未开放为好友支付哦~');
+            }
+        }
+        else
+        {
+            die('订单状态不正确~');
+        }
     }
     // 支付完成跳回
     public function return()
@@ -51,19 +68,18 @@ class AlipayController
             // 这里需要对 trade_status 进行判断及其它逻辑进行判断，在支付宝的业务通知中，只有交易通知状态为 TRADE_SUCCESS 或 TRADE_FINISHED 时，支付宝才会认定为买家付款成功。
             // 1、商户需要验证该通知数据中的out_trade_no是否为商户系统中创建的订单号；
             // 2、判断total_amount是否确实为该订单的实际金额（即商户订单创建时的金额）；
-            echo '订单ID：'.$data->out_trade_no ."\r\n";
-            echo '支付总金额：'.$data->total_amount ."\r\n";
-            echo '支付状态：'.$data->trade_status ."\r\n";
-            echo '商户ID：'.$data->seller_id ."\r\n";
-            echo 'app_id：'.$data->app_id ."\r\n";
+            if($data->trade_status == 'TRADE_SUCCESS' || $data->trade_status == 'TRADE_FINISHED')
+            {
+                $order = new \models\Order;
+                $orderInfo = $order->findBySn($data->out_trade_no);
+                if($orderInfo['status']==0)
+                {
+                    $order->setPaid($data->out_trade_no);
+                    $user = new \models\User;
+                    $user->addMoney($orderInfo['money'],$orderInfo['user_id']);
+                }
+            }
 
-            $mess = '订单ID：'.$data->out_trade_no ."\r\n";
-            $mess .= '支付总金额：'.$data->total_amount ."\r\n";
-            $mess .= '支付状态：'.$data->trade_status ."\r\n";
-            $mess .= '商户ID：'.$data->seller_id ."\r\n";
-            $mess .= 'app_id：'.$data->app_id ."\r\n";
-            $log = new Log('order');
-            $log->log( $mess );
         } catch (\Exception $e) {
             echo '失败：';
             var_dump($e->getMessage()) ;

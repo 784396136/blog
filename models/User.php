@@ -8,6 +8,17 @@ class User extends Base
         return 'tom';
     }
 
+    // 更新用户余额
+    public function addMoney($money,$userId)
+    {
+        $stmt = self::$pdo->prepare("UPDATE users set money = money+? WHERE id = ?");
+        $stmt->execute([
+            $money,
+            $userId,
+            ]);
+
+    }
+
     // 登录
     public function login($email,$pwd)
     {
@@ -21,6 +32,7 @@ class User extends Base
         {
             $_SESSION['id'] = $user['id'];
             $_SESSION['email'] = $user['email'];
+            $_SESSION['money'] = $user['money'];
             return true;
         }
         else

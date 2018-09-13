@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <?php view('common.nav') ?>
+    <form action="/user/doupload" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" id="img"><br>
+        <input type="submit" value="上传">
+    </form>
+    <?php view('common.footer') ?>
+</body>
+</html>
+<script src="/simditor-2.3.6/scripts/jquery.min.js"></script>
+<script>
+
+
+    $(function(){
+        var img = document.getElementById('img');
+        img.onchange = function(){
+            // 获取图片
+            var picture = this.files[0];
+            // 获取上传图片的尺寸
+            var fileSize = picture['size'];
+            // 定义每块的尺寸
+            var preSize = 4096;
+            // 计算分片数
+            var count = Math.ceil(fileSize / preSize);
+            // 为所有分片生成一个唯一的名字
+            var name = "img_" + Math.random(1,99999);
+
+            for(var i=0;i<count;i++)
+            {
+                var img0 = picture.slice(i*preSize,i*preSize+preSize)
+
+                var f = new FormData();
+
+                f.append('img', picture)     // 图片数据
+                f.append('count', count)   // 总的块数
+                f.append('i', i)           // 当前图片是第几块
+                f.append('size', preSize)  // 每块尺寸
+                f.append('img_name', name)  // 名字
+                // 上传的服务器
+                $.ajax({
+                    type : "POST",
+                    url : "/user/uploadbig",
+                    data : f,
+                    contentType: false,
+                    processData: false,
+                    success:function(data){
+
+                    }
+                });
+            }
+            
+        }
+    })
+    
+</script>
