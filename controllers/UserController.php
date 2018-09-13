@@ -13,6 +13,7 @@ class UserController
 
     public function uploadbig()
     {
+
         /* 接收提交的数据 */
         $count = $_POST['count'];  // 总的数量
         $i = $_POST['i'];        // 当前是第几块
