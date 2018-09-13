@@ -123,9 +123,6 @@ class Blog extends Base
         // 生成静态页
         foreach($data as $v)
         {
-            // echo '<pre>';
-            // var_dump($v);
-            // die();
             view('blog.content',[
                 'blog'=>$v,
             ]);

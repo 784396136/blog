@@ -23,6 +23,7 @@ class MockController{
             $pdo->exec("INSERT INTO blogs (title,content,display,is_show,created_at,user_id) VALUES('$title','$content',$display,$is_show,'$date',{$user_id})");
             // 抛出错误异常
             // print_r($pdo->errorInfo());
+            
         }
     }
 
