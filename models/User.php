@@ -19,6 +19,17 @@ class User extends Base
 
     }
 
+    public function getMoney()
+    {
+        $stmt = self::$pdo->prepare("SELECT money FROM users WHERE id=?");
+        $stmt->execute([
+            $_SESSION['id'],
+        ]);
+        $money = $stmt->fetch( PDO::FETCH_COLUMN );
+        $_SESSION['money'] = $money;
+        return $money;
+    }
+
     public function minusMoney($money,$userId)
     {
         $stmt = self::$pdo->prepare("UPDATE users set money = money-? WHERE id = ?");

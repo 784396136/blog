@@ -26,7 +26,7 @@ var si = setInterval(function(){
     <input type="button" value="更新余额" id="b-money">
     <script>
         $('#b-money').click(function(){
-            alert('123');
+           $('#s-money').load("/user/money");
         })
     </script>
     <a href="/user/orders">订单列表</a>

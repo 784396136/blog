@@ -50,9 +50,8 @@ class UserController
     // 测试
     public function text()
     {
-        $order = new \models\Order;
-        $res = $order->setPaid('259346095908323328',2);
-        var_dump($res);
+        $order = new \models\Refund;
+        $order->create('2018091221001004210200503880','100','123456');
     }
 
     // 充值
@@ -74,6 +73,12 @@ class UserController
         {
             message("下单失败,请稍后再试",2,"/user/recharge");
         }
+    }
+
+    public function money()
+    {
+        $user = new User;
+        echo $user->getMoney();
     }
 
     public function orders()

@@ -105,7 +105,8 @@ class AlipayController
         $order = new \models\Order;
         $data = $order->findBySn($sn);
         // 生成唯一退款订单号 2018091221001004210200503880
-        $refundNo = md5( rand(1,99999) . microtime() );
+        $flake = new \libs\Snowflake(0);
+        $refundNo = $flake->nextId();
         try{
             // 退款
             $ret = Pay::alipay($this->config)->refund([
