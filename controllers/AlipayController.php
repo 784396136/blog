@@ -10,7 +10,7 @@ class AlipayController
     public $config = [
         'app_id' => '2016091700531217',
         // 通知地址
-        'notify_url' => ' http://9cd66fcb.ngrok.io/alipay/notify',
+        'notify_url' => 'https://d1f06784.ngrok.io/alipay/notify',
         // 跳回地址
         'return_url' => 'http://localhost:3333/alipay/return',
         // 支付宝公钥
@@ -36,7 +36,7 @@ class AlipayController
                 $alipay = Pay::alipay($this->config)->web([
                     'out_trade_no' => $sn,
                     'total_amount' => $data['money'],
-                    'subject' => '智聊系统用户充值-'.$data['money'].'元',
+                    'subject' => '智聊系统用户充值 '.$data['money'].'元',
                 ]);
                 $alipay->send();
             }
@@ -74,9 +74,19 @@ class AlipayController
                 $orderInfo = $order->findBySn($data->out_trade_no);
                 if($orderInfo['status']==0)
                 {
-                    $order->setPaid($data->out_trade_no);
+                    $order->startTrans();
+                    // 更新订单为已支付
+                    $res1 = $order->setPaid($data->out_trade_no);
                     $user = new \models\User;
-                    $user->addMoney($orderInfo['money'],$orderInfo['user_id']);
+                    $res2 = $user->addMoney($orderInfo['money'],$orderInfo['user_id']);
+                    if($res1 && $res2)
+                    {
+                        $order->commit();
+                    }
+                    else
+                    {
+                        $order->rollback();
+                    }
                 }
             }
 
@@ -91,18 +101,38 @@ class AlipayController
     // 退款
     public function refund()
     {
+        $sn = $_POST['sn'];
+        $order = new \models\Order;
+        $data = $order->findBySn($sn);
         // 生成唯一退款订单号 2018091221001004210200503880
         $refundNo = md5( rand(1,99999) . microtime() );
         try{
             // 退款
             $ret = Pay::alipay($this->config)->refund([
-                'out_trade_no' => '1536738943',    // 之前的订单流水号
-                'refund_amount' => 100,              // 退款金额，单位元
+                'out_trade_no' => $sn,    // 之前的订单流水号
+                'refund_amount' => $data['money'],              // 退款金额，单位元
                 'out_request_no' => $refundNo,     // 退款订单号
             ]);
             if($ret->code == 10000)
             {
-                echo '退款成功！';
+                $refund = new \models\Refund;
+                $refund->create($sn,$data['money'],$refundNo);
+                $order = new \models\Order;
+                $user = new \models\User;
+                // 开启事务
+                $order->startTrans();
+                $res1 = $order->refund($sn);
+                $res2 = $user->minusMoney($data['money'],$data['user_id']);
+                if($res1 && $res2)
+                {
+                    $order->commit();
+                    echo '退款成功！';
+                }
+                else
+                {
+                    $order->rollback();
+                }
+                
             }
         }
         catch(\Exception $e)

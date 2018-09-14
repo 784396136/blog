@@ -5,9 +5,21 @@ use PDO;
 class Order extends Base
 {
     // 更新订单状态
+    // 更新为已支付
     public function setPaid($sn)
     {
         $stmt = self::$pdo->prepare("UPDATE orders SET status = 1 , pay_time = now() WHERE sn = ?");
+        
+        return $stmt->execute([
+            $sn,
+        ]);
+    }
+
+    // 更新为一退款
+    public function refund($sn)
+    {
+        $stmt = self::$pdo->prepare("UPDATE orders SET status = 2 WHERE sn = ?");
+        
         return $stmt->execute([
             $sn,
         ]);

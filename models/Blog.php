@@ -6,6 +6,12 @@ use libs\Redis;
 class Blog extends Base
 {
 
+    public function getNew()
+    {
+        $stmt = self::$pdo->query('SELECT * FROM blogs WHERE is_show=1 ORDER BY id DESC LIMIT 20');
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function search()
     {
         $where = 'user_id ='.$_SESSION['id'];

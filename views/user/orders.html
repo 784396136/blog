@@ -39,6 +39,14 @@
                     <input type="hidden" name="sn" value="<?=$v['sn']?>">
                     <input type="submit" value="点击支付">
                 </form>
+                <?php elseif($v['status']==1): ?>
+                <form target="_blank" action="/alipay/refund" method="POST">
+                    <?=csrf_field()?>
+                    <input type="hidden" name="sn" value="<?=$v['sn']?>">
+                    <input type="submit" value="点击退款">
+                </form>
+                <?php elseif($v['status']==2): ?>
+                    <span style="color:#0f0">已退款</span>
                 <?php endif; ?>
             </td>
         </tr>

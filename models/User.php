@@ -12,11 +12,20 @@ class User extends Base
     public function addMoney($money,$userId)
     {
         $stmt = self::$pdo->prepare("UPDATE users set money = money+? WHERE id = ?");
-        $stmt->execute([
+        return $stmt->execute([
             $money,
             $userId,
             ]);
 
+    }
+
+    public function minusMoney($money,$userId)
+    {
+        $stmt = self::$pdo->prepare("UPDATE users set money = money-? WHERE id = ?");
+        return $stmt->execute([
+            $money,
+            $userId,
+            ]);
     }
 
     // 登录

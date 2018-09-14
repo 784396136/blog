@@ -50,8 +50,9 @@ class UserController
     // 测试
     public function text()
     {
-        $user = new User;
-        $user->addMoney(20,8);
+        $order = new \models\Order;
+        $res = $order->setPaid('259346095908323328',2);
+        var_dump($res);
     }
 
     // 充值
