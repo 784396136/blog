@@ -5,7 +5,29 @@ use models\Order;
 
 class UserController
 {
-    // 头像视图
+    // 上传头像
+    public function avatar()
+    {
+        view("user.avatar");
+    }
+
+    public function setavatar()
+    {
+        $upload = \libs\Uploader::make();
+        $path = $upload->upload('avatar','avatar');
+
+        // 保存到user用户表中
+        $user = new User;
+        $user->setavatar('/uploads/'.$path);
+
+        // 在硬盘上删除原有的图片
+        @unlink(ROOT.'public'.$_SESSION['avatar']);
+        $_SESSION['avatar'] = '/uploads/'.$path;
+
+        message("设置头像成功",2,"/blog/index");
+    }
+
+    // 上传大文件视图
     public function face()
     {
         view('user.face');

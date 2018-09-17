@@ -10,7 +10,7 @@ class AlipayController
     public $config = [
         'app_id' => '2016091700531217',
         // 通知地址
-        'notify_url' => 'https://d1f06784.ngrok.io/alipay/notify',
+        'notify_url' => 'http://1d0ead02.ngrok.io/alipay/notify',
         // 跳回地址
         'return_url' => 'http://localhost:3333/alipay/return',
         // 支付宝公钥

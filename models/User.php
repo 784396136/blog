@@ -8,6 +8,16 @@ class User extends Base
         return 'tom';
     }
 
+    // 设置头像
+    public function setavatar($path)
+    {
+        $stmt = self::$pdo->prepare("UPDATE users SET avatar = ? WHERE id = ?");
+        $stmt -> execute([
+            $path,
+            $_SESSION['id'],
+        ]);
+    }
+
     // 更新用户余额
     public function addMoney($money,$userId)
     {
@@ -53,6 +63,7 @@ class User extends Base
             $_SESSION['id'] = $user['id'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['money'] = $user['money'];
+            $_SESSION['avatar'] = $user['avatar'];
             return true;
         }
         else

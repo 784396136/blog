@@ -24,6 +24,11 @@ var si = setInterval(function(){
     <?=$_SESSION['email']?>
     （ <span id="s-money" style="color:#F00;font-weight:bold;"><?=@$_SESSION['money']?></span> 元 ）
     <input type="button" value="更新余额" id="b-money">
+    <?php if($_SESSION['avatar']!=''): ?>
+    <img src="<?=$_SESSION['avatar']?>" style="width:100px; height:100px; border-radius:50%; vertical-align: middle;">
+    <?php else: ?>
+    <img src="/uploads/avatar/default.jpg" style="width:100px; height:100px; border-radius:50%; vertical-align: middle;">
+    <?php endif; ?>
     <script>
         $('#b-money').click(function(){
            $('#s-money').load("/user/money");
@@ -31,7 +36,8 @@ var si = setInterval(function(){
     </script>
     <a href="/user/orders">订单列表</a>
     <a href="/user/recharge">充值</a>
-    <a href="/user/face">上传头像</a>
+    <a href="/user/avatar">上传头像</a>
+    <a href="/user/face">上传大文件</a>
     <a href="/blog/makeExcel">导出 Excel</a>
     <a href="/user/logout"> 退出 </a>
 <?php else: ?>
