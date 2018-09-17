@@ -38,7 +38,7 @@ class Uploader{
     public function _makeDir()
     {
         $dir = $this->_subDir . "/" . date("Ymd");
-        if(!is_dir($this->_root . $this->_subDir))
+        if(!is_dir($this->_root . $dir))
         {
             mkdir($this->_root . $dir , 0777, TRUE);
         }
@@ -74,7 +74,6 @@ class Uploader{
 
         // 生成唯一文件名
         $name = $this->_makename();
-
         // 移动文件
         move_uploaded_file($this->_file['tmp_name'],$this->_root .$dir . $name);
         return $dir.$name;

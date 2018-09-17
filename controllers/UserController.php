@@ -1,7 +1,9 @@
 <?php
 namespace controllers;
+
 use models\User;
 use models\Order;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class UserController
 {
@@ -15,7 +17,12 @@ class UserController
     {
         $upload = \libs\Uploader::make();
         $path = $upload->upload('avatar','avatar');
-
+        $way = ROOT . "/public/uploads/";
+        $image = Image::make($way.$path);
+        $image->crop((int)$_POST['w'],(int)$_POST['h'],(int)$_POST['x'],(int)$_POST['y']);
+        $image->save($way.$path);
+        // echo "<pre>";
+        // var_dump($image);die;
         // 保存到user用户表中
         $user = new User;
         $user->setavatar('/uploads/'.$path);
@@ -67,13 +74,6 @@ class UserController
             // 从 redis 中删除这个文件对应的编号这个变量
             $redis->del($name);
         }
-    }
-
-    // 测试
-    public function text()
-    {
-        $order = new \models\Refund;
-        $order->create('2018091221001004210200503880','100','123456');
     }
 
     // 充值
