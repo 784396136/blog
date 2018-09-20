@@ -86,7 +86,13 @@ class BlogController
         // 接受日志ID
         $id = (int)$_GET['id'];
         $blog = new Blog;
-        echo $blog->getDisplay($id);
+        $display = $blog->getDisplay($id); 
+        echo json_encode([
+            'display' => $display,
+            'email' => isset($_SESSION['email']) ? $_SESSION['email'] : '',
+            'money' => isset($_SESSION['money']) ? $_SESSION['money'] : '',
+            'avatar' =>isset($_SESSION['avatar']) && $_SESSION['avatar'] == '' ? '/public/uploads/avatar/default.jpg' : $_SESSION['avatar'],
+        ]);
     }
 
     //将内存中的数据写回数据库
@@ -146,6 +152,8 @@ class BlogController
         $id = $_GET['id'];
         $blog = new Blog;
         $data = $blog->find($id);
+        if($data['user_id']!=@$_SESSION['id'])
+        message("没有权限",2);
         view('blog.edit',[
             'data'=>$data,
         ]);
@@ -181,7 +189,7 @@ class BlogController
     public function delete()
     {
         $id = $_POST['id'];
-        $blog = new Blog;
+        $blog = new Blog; 
         if($blog->delete($id))
         {
             $blog->deleteHtml($id);

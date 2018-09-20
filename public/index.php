@@ -121,7 +121,7 @@ function back()
 // 提示消息的函数
 // type 0:alert   1:显示单独的消息页面  2：在下一个页面显示
 // 说明：$seconds 只有在 type=1时有效，代码几秒自动跳动
-function message($message, $type, $url, $seconds = 5)
+function message($message, $type, $url="", $seconds = 5)
 {
     if($type == 0)
     {
@@ -143,7 +143,10 @@ function message($message, $type, $url, $seconds = 5)
         // 把消息保存到 SESSION
         $_SESSION['_MESS_'] = $message;
         // 跳转到下一个页面
-        redirect($url);
+        if($url!="")
+            redirect($url);
+        else
+            back();
     }
 }
 

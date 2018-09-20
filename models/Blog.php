@@ -12,6 +12,61 @@ class Blog extends Base
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // 获取所有公开日志
+    public function getblog()
+    {
+        
+        $where = "is_show = 1";
+
+        /*-------------------排序--------------------*/
+        // 默认排序条件
+        $orderBy = 'created_at';
+        $orderWay = 'desc';
+
+        if(isset($_GET['order_by']) && $_GET['order_by']=='display')
+        {
+            $orderBy = 'display';
+        }
+        if(isset($_GET['order_way']) && $_GET['order_way']=='asc')
+        {
+            $orderWay = 'asc';
+        }
+
+        /*-----------------翻页--------------------*/
+        //每页条数
+        $perpage = 10;
+        // 当前页
+        $page = isset($_GET['page']) ? max($_GET['page'],1) : 1;
+        // 起始值
+        $offset = ($page-1)*$perpage;
+        // 拼出limit语句
+        $limit = $offset.",".$perpage;
+        
+        /*-----------------翻页按钮------------------ */
+        $stmt = self::$pdo->prepare("SELECT COUNT(*) FROM blogs WHERE $where");
+        $stmt->execute();
+        $count = $stmt->fetch( PDO::FETCH_COLUMN );
+        $perCount = ceil($count/$perpage);
+        $btns = '';
+        for($i=1;$i<=$perCount;$i++)
+        {
+            $parms = getUrl(['page']);
+            $class = $page==$i ? 'btns-active' : '';
+            $btns .= "<a class='{$class}' href='?{$parms}page={$i}'>$i</a>";
+        }
+       
+
+        // 进行预处理
+        $stmt = self::$pdo->prepare("SELECT * FROM blogs WHERE $where ORDER BY $orderBy $orderWay LIMIT $limit");    
+        $stmt->execute();
+        // var_dump($stmt);
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return [
+            'data'=>$data,
+            'btns'=>$btns,
+        ];
+    }
+
     public function search()
     {
         $where = 'user_id ='.$_SESSION['id'];
@@ -206,6 +261,8 @@ class Blog extends Base
     // 删除日志
     public function delete($id)
     {
+        $blog = $this->find($id);
+        if(@$blog['id']!=@$_SESSION['id'])die('没有权限');
         $stmt = self::$pdo->prepare("DELETE FROM blogs WHERE id = ? AND user_id = ?");
         return $stmt->execute([
             $id,

@@ -20,6 +20,16 @@ class CommentController
 
         $content = e($_POST['content']);
         $blog_id = $_POST['blog_id'];
+        if($_SESSION['avatar']=='')
+        {
+            $avatar = '/uploads/avatar/default.jpg';
+        }
+        else
+        {
+            $avatar = $_SESSION['avatar'];
+        }
+
+        
 
         $model = new \models\Comment;
         $model->add($content,$blog_id);
@@ -29,19 +39,24 @@ class CommentController
             'message' => '发表成功',
             'data' => [
                 'content' => $content,
-                'avatar' => $_SESSION['avatar'],
+                'avatar' => $avatar,
                 'email' => $_SESSION['email'],
                 'created_at' => date("Y-m-d H:i:s"),
             ]
         ]);
-        exit;
     }
-
+ 
     public function comment_list()
     {
         $id = $_GET['id'];
         $comment = new \models\Comment;
         $data = $comment->getComments($id);
+        foreach($data as $k => $v)
+        {
+            if($data[$k]['avatar']=='')
+            $data[$k]['avatar'] = '/uploads/avatar/default.jpg';
+        }
+        
         echo json_encode([
             'status_code' => '200',
             'data' => $data,

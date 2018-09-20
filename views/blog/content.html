@@ -33,7 +33,9 @@
     </style>
 </head>
 <body>
-    <?php view('common.nav') ?>
+    <h1>智聊系统</h1>
+
+    <div id="menu"></div>
 
     <h1><?=$blog['title']?></h1>
     <p>浏览量:<span id="display"></span></p>
@@ -43,7 +45,12 @@
 
         <div v-for="(v,k) in comments" class="comment-list">
             <div class="left">
-                <img :src="v.avatar" width="85" height="85" alt="">
+                <div v-if="v.avatar==''">
+                    <img src="/uploads/avatar/default.jpg" width="85" height="85" alt=""> 
+                </div>
+                <div v-else>
+                    <img :src="v.avatar" width="85" height="85" alt="">
+                </div>
                 <p> {{v.email}} </p>
             </div>
             <div class="right">
@@ -70,19 +77,59 @@
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="crossorigin="anonymous"></script>
 <script>
     var id = "<?=$blog['id']?>";
+    
     var url = "/blog/display?id="+id;
+    console.log(id,url);
     $.ajax({
         type:"GET",
         url:url,
+        dataType:'json',
         success:function(data)
         {
-            $('#display').html(data);
+            console.log(data)
+            $('#display').html(data.display); 
+
+            var html = "<a href='/'>首页</a>";
+            if(data.email=='')
+            {
+                html += `<a href="/user/register">注册</a>
+                         <a href="/user/login">登录</a>`;
+            }
+            else
+            {
+                html += `<a href="/blog/index">日志列表</a>
+                        <?php if(isset($_SESSION['id'])): ?>
+                        <?=$_SESSION['email']?>
+                        （ <span id="s-money" style="color:#F00;font-weight:bold;"><?=@$_SESSION['money']?></span> 元 ）
+                        <input type="button" value="更新余额" id="b-money">`
+
+                        if("<?=$_SESSION['avatar']?>"!='')
+                            html += "<img src='<?=$_SESSION['avatar']?>' style='width:100px; height:100px; border-radius:50%; vertical-align: middle;'>";
+                        else
+                            html += "<img src='/uploads/avatar/default.jpg' style='width:100px; height:100px; border-radius:50%; vertical-align: middle;'>";
+
+                html += `<a href="/user/orders">订单列表</a>
+                            <a href="/user/recharge">充值</a>
+                            <a href="/redbag/rob_view">抢红包</a>
+                            <a href="/user/avatar">上传头像</a>
+                            <a href="/user/face">上传大文件</a>
+                            <a href="/blog/makeExcel">导出 Excel</a>
+                            <a href="/user/logout"> 退出 </a>
+                            <?php endif;?>`;
+                            
+            }
+
+            $("#menu").html(html);
+
         }
     })
 </script>
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
+    $('#b-money').click(function(){
+        $('#s-money').load("/user/money");
+    })
     const app = new Vue({
         el:'#comment_list',
         data:{
@@ -118,7 +165,6 @@
         created:function(){
             axios.get('/comment/comment_list?id='+this.blog_id)
             .then(res=>{
-                console.log(res.data.status_code)
                 if(res.data.status_code==200){
                     this.comments = res.data.data
                 }

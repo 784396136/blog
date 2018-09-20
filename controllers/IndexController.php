@@ -1,15 +1,15 @@
 <?php
 namespace controllers;
 
-use models\User;
+use \models\Blog;
+
 class IndexController{
     function index(){
-        $user = new User;
-        $name = $user->getName();
+
+        $blog = new Blog;
+        $data = $blog->getblog();
         
-        return view('user.hello',[
-            'name'=>$name,
-        ]);
+        return view('blog.blogs', $data);
         
     }
 }

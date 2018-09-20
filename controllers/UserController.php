@@ -13,6 +13,7 @@ class UserController
         view("user.avatar");
     }
 
+
     public function setavatar()
     {
         $upload = \libs\Uploader::make();
