@@ -1,11 +1,69 @@
 <?php
 namespace models;
 use PDO;
+use function GuzzleHttp\json_decode;
 
 class User extends Base
 {
     function  getName(){
         return 'tom';
+    }
+
+    // 计算活跃用户
+    public function computerActiveUser()
+    {
+        // 取出一周内日志的分值
+        $stmt = self::$pdo->query("SELECT user_id,COUNT(*)*5 fz
+                                    FROM blogs 
+                                    WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+                                        GROUP BY user_id");
+        $data1 = $stmt->fetchAll( PDO::FETCH_ASSOC );
+        // 取出一周内评论的分值
+        $stmt = self::$pdo->query("SELECT user_id,COUNT(*)*3 fz
+                                    FROM comments 
+                                    WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+                                        GROUP BY user_id");
+        $data2 = $stmt->fetchAll( PDO::FETCH_ASSOC );
+
+        $arr = [];
+        foreach($data1 as $v)
+        {
+            $arr[$v['user_id']] = $v['fz'];
+        }
+
+        foreach($data2 as $v)
+        {
+            if(isset($arr[$v['user_id']]))
+                $arr[$v['user_id']] += $v['fz'];
+            else
+                $arr[$v['user_id']] = $v['fz'];
+        }
+
+        arsort($arr);
+
+        $data = array_slice($arr,0,20,TRUE);
+
+        $userIds = array_keys($data);
+
+        $userIds = implode(',',$userIds);
+
+        $sql = "SELECT id,email,avatar FROM users WHERE id IN ($userIds)";
+
+        $stmt = self::$pdo->query($sql);
+
+        $data = $stmt->fetchAll( PDO::FETCH_ASSOC );
+
+        $redis = \libs\Redis::getInstance();
+
+        $redis->set("active_users",json_encode($data));
+    }
+
+    // 获取活跃用户
+    public function getActiveUsers()
+    {
+        $redis = \libs\Redis::getInstance();
+        $data = $redis->get("active_users");
+        return json_decode($data,TRUE);
     }
 
     // 设置头像

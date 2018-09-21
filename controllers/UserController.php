@@ -13,6 +13,11 @@ class UserController
         view("user.avatar");
     }
 
+    public function text()
+    {
+        $user = new User;
+        $user->computerActiveUser();
+    }
 
     public function setavatar()
     {

@@ -8,8 +8,14 @@ class IndexController{
 
         $blog = new Blog;
         $data = $blog->getblog();
-        
-        return view('blog.blogs', $data);
+
+        // 获取活跃用户
+        $user = new \models\User;
+        $users = $user->getActiveUsers();
+        return view('blog.index', [
+                "blogs"=>$data,
+                "users"=>$users
+            ]);
         
     }
 }

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+    .order_active {
+        font-size: 1.2em;
+        color: #F00;
+    }
+    .btns-active {
+        color: #f00;
+    }
+    </style>
+</head>
+<body>
+    <?php view('common.nav') ?>
+    <div style="margin: 0 auto;">
+        <form>
+            关键字：
+            <input type="text" name="keywords" value="<?=@$_GET['keywords']?>">
+            发表日期：
+            <input type="text" name="start_date" value="<?=@$_GET['start_date']?>"> ~
+            <input type="text" name="end_date" value="<?=@$_GET['end_date']?>">
+            是否显示：
+            <input type="radio" name="is_show" value="" <?php if(!isset($_GET['is_show']) || $_GET['is_show'] == '') echo 'checked' ?>> 全部
+            <input type="radio" name="is_show" value="0" <?php if(isset($_GET['is_show']) && $_GET['is_show'] == '0') echo 'checked' ?>> 不显示
+            <input type="radio" name="is_show" value="1" <?php if(isset($_GET['is_show']) && $_GET['is_show'] == '1') echo 'checked' ?>> 显示
+            <input type="submit" value="搜索">
+        </form>
+    </div>
+    <table border="1" width="100%">
+        <tr>
+            <th>ID</th>
+            <th width="40%">标题</th>
+            <th>
+                
+                发表日期
+                <a href="?order_by=date&order_way=asc<?=getUrl(['order_by','order_way'])?>"  <?php if(@$_GET['order_by']=='date' && @$_GET['order_way']=='asc') echo 'class="order_active"' ?> >㊤</a>
+                <a href="?order_by=date&order_way=desc<?=getUrl(['order_by','order_way'])?>" <?php if(@$_GET['order_by']=='date' && @$_GET['order_way']=='desc') echo 'class="order_active"' ?> >㊦</a>
+            </th>
+            <th>修改日期</th>
+            <th>是否显示</th>
+            <th>
+                浏览量
+                <a href="?order_by=display&order_way=asc<?=getUrl(['order_by','order_way'])?>" <?php if(@$_GET['order_by']=='display' && @$_GET['order_way']=='asc') echo 'class="order_active"' ?>>㊤</a>
+                <a href="?order_by=display&order_way=desc<?=getUrl(['order_by','order_way'])?>" <?php if(@$_GET['order_by']=='display' && @$_GET['order_way']=='desc') echo 'class="order_active"' ?>>㊦</a>
+            </th>
+            <th>操作</th>
+            <?php foreach($blogs['data'] as $v): ?>
+            <tr>
+                <td><?=$v['id']?></td>
+                <td>
+                    <?php if($v['is_show']==1): ?>
+                        <a href="/contents/<?=$v['id']?>.html" target="_blank"><?=e($v['title'])?></a>
+                    <?php else: ?>
+                        <a href="/blog/content?id=<?=$v['id']?>" target="_blank"><?=e($v['title'])?></a>
+                    <?php endif; ?>
+                </td>
+                <td><?=$v['created_at']?></td>
+                <td><?=$v['updated_at']?></td>
+                <td><?= $v['is_show']==1?'显示':'不显示' ?></td>
+                <td><?=$v['display']?></td>
+                <td>
+                    <a href="/blog/edit?id=<?=$v['id']?>">修改</a>
+                    <form action="/blog/delete" method="post">
+                        <?php csrf_field() ?>
+                        <input type="hidden" name="id" value="<?=$v['id']?>">
+                        <input type="submit" value="删除" onclick="return confirm('确定删除么?')">
+                    </form>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tr>
+    </table>
+    <br>
+    <?=$blogs['btns']?>
+    <hr>
+    <h1>一周活跃用户</h1>
+    <ul>
+        <?php $a = 1; ?>
+        <!-- <?php echo "<pre>"; var_dump($users); ?> -->
+        <?php 
+            $no = 1;
+            foreach($users as $v)
+            {
+                if(@$_SESSION['email']==$v['email'])
+                echo "<span>您当前排在第{$a}名</span>";
+                else
+                $no++;
+                if($no>count($users))
+                echo "<span>您当前未上榜,加油哦~ヾ(◍°∇°◍)ﾉﾞ</span>";
+                $a++;
+            }
+        ?>
+
+        <?php foreach($users as $v): ?>
+            <li style="list-style:none;">
+                <?php if($v['avatar']!="") : ?>
+                    <img size="50"  height="50" src="<?=  $v['avatar'] ? $v['avatar'] : '/images/avatar.jpg'   ?>" title="<?=@$v['email']?>"><span <?php if(@$_SESSION['email']==$v['email']) echo "style='color:#f00'" ?>><?=$v['email']?></span>
+                <?php else: ?>
+                    <img size="50" height="50" src="/uploads/avatar/default.jpg" title="<?=$v['email']?>"><span <?php if(@$_SESSION['email']==$v['email']) echo "style='color:#f00'" ?>><?=$v['email']?></span>
+                <?php endif;?>
+            </li>
+
+        <?php endforeach; ?>
+    </ul>
+
+
+    <?php view('common.footer') ?>
+</body>
+</html>
